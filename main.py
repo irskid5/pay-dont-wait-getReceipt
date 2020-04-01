@@ -24,7 +24,7 @@ def lambda_handler(event, context):
         print(receipt)
         
         total = receipt[1][8]
-        service_id, day_of_service, service_started, server, table_id = receipt[1][0:4]
+        service_id, day_of_service, service_started, server, table_id = receipt[1][0:5]
         
         items = {}
         for i in range(1,len(receipt)):
