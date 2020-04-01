@@ -1,6 +1,15 @@
-import json
+import simplejson as json
 import psycopg2
 import traceback
+import decimal
+from datetime import datetime
+
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, datetime):
+            return o.isoformat()
+
+        return json.JSONEncoder.default(self, o)
 
 def lambda_handler(event, context):
     # TODO implement
@@ -44,7 +53,7 @@ def lambda_handler(event, context):
                 "x-custom-header" : "my custom header value",
                 "Access-Control-Allow-Origin": "*"
             },
-            'body': json.dumps({"success": True, "total": total, "table_id": table_id, "service_id": service_id, "day_of_service": day_of_service, "service_started": service_started, "items_and_quantities_and_prices": items})
+            'body': json.dumps({"success": True, "total": total, "table_id": table_id, "service_id": service_id, "day_of_service": day_of_service, "service_started": service_started, "items_and_quantities_and_prices": items}, cls=DateTimeEncoder)
         } 
     except Exception as err:
         print("Exception: " + str(err))
