@@ -36,8 +36,7 @@ def lambda_handler(event, context):
         service_id, day_of_service, service_started, server, table_id = receipt[1][0:5]
         
         items = {}
-        for i in range(1,len(receipt)):
-            #items[description] = [quantity, amount]
+        for i in range(len(receipt)):
             items[receipt[i][5]] = {"maxNumber": receipt[i][6], "cost": receipt[i][7], "number": receipt[i][6], "total": receipt[i][6]*receipt[i][7]}
             
         print(items)
