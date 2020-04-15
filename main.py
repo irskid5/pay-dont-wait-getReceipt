@@ -29,8 +29,18 @@ def lambda_handler(event, context):
         cursor.execute("create temporary view info as SELECT service_id, day_of_service, service_started FROM Service Where table_id = %s ORDER BY day_of_service DESC, service_started DESC LIMIT 1; create temporary view receipt as SELECT info.service_id as service_id, day_of_service, service_started, name as server, table_id, item_desc as description, quantity, price as amount FROM info NATURAL JOIN Service NATURAL JOIN Servers NATURAL JOIN Suborder NATURAL JOIN Items ORDER BY item_desc ASC; create temporary view total as SELECT sum(amount*quantity) as total FROM receipt; SELECT * FROM receipt, total; ",(event["queryStringParameters"]["table_id"],))
            
         receipt = cursor.fetchall()
-
         print(receipt)
+
+         #if everything had already been paid for or no items in receipt
+        if receipt == []:
+            return {
+                'statusCode': 200,
+                'headers': {
+                    "x-custom-header" : "my custom header value",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                'body': json.dumps({"success": False, "table_id": event["queryStringParameters"]["table_id"], "error": "no items in receipt"})
+            }
         
         total = receipt[1][8]
         service_id, day_of_service, service_started, server, table_id = receipt[1][0:5]
